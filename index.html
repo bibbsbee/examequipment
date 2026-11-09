@@ -8,12 +8,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        @media print {
+            @page { size: landscape; margin: 8mm; }
+            body { background: white; -webkit-print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            .print-landscape { width: 100%; max-width: none; border: none !important; box-shadow: none !important; padding: 0 !important; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
     <!-- Header Instansi Dinamis -->
-    <header class="bg-slate-900 text-white shadow-md">
+    <header class="bg-slate-900 text-white shadow-md no-print">
         <div class="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 id="app-instansi-name" class="text-2xl font-bold tracking-tight">SMP/MTs [NAMA INSTANSI]</h1>
@@ -27,12 +33,12 @@
     </header>
 
     <!-- Navigasi Tab -->
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-xs">
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-xs no-print">
         <div class="max-w-7xl mx-auto px-4 flex overflow-x-auto space-x-6">
             <button onclick="switchTab('tab-setup')" id="btn-tab-setup" class="py-4 px-2 border-b-2 border-blue-600 text-blue-600 font-semibold text-sm whitespace-nowrap transition">1. Setup Instansi & Sesi</button>
-            <button onclick="switchTab('tab-teachers')" id="btn-tab-teachers" class="py-4 px-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-medium text-sm whitespace-nowrap transition">2. Data Guru & Mapel</button>
+            <button onclick="switchTab('tab-teachers')" id="btn-tab-teachers" class="py-4 px-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-medium text-sm whitespace-nowrap transition">2. Data Guru & Panitia</button>
             <button onclick="switchTab('tab-rooms')" id="btn-tab-rooms" class="py-4 px-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-medium text-sm whitespace-nowrap transition">3. Ruang & Hari Ujian</button>
-            <button onclick="switchTab('tab-generator')" id="btn-tab-generator" class="py-4 px-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-medium text-sm whitespace-nowrap transition">4. Generate Jadwal & Pengawas</button>
+            <button onclick="switchTab('tab-generator')" id="btn-tab-generator" class="py-4 px-2 border-b-2 border-transparent text-slate-500 hover:text-slate-800 font-medium text-sm whitespace-nowrap transition">4. Generate Jadwal & Cetak</button>
         </div>
     </nav>
 
@@ -67,13 +73,13 @@
             </div>
         </section>
 
-        <!-- TAB 2: DATA GURU & MAPEL DIUMPU -->
+        <!-- TAB 2: DATA GURU & PANITIA -->
         <section id="tab-teachers" class="hidden space-y-6">
             <div class="bg-white p-6 rounded-xl shadow-xs border border-slate-200">
                 <div class="flex justify-between items-center mb-4">
                     <div>
-                        <h2 class="text-lg font-bold text-slate-900">Daftar Guru & Mapel yang Diampu</h2>
-                        <p class="text-xs text-slate-500">Tambahkan daftar guru Anda. Guru pengampu mapel tertentu otomatis dicegah mengawas di ruang ujian mapel tersebut.</p>
+                        <h2 class="text-lg font-bold text-slate-900">Daftar Guru, Mapel Diampu & Status Panitia</h2>
+                        <p class="text-xs text-slate-500">Panitia Inti otomatis dijadwalkan mengawas lebih sedikit / minimal dibanding guru reguler.</p>
                     </div>
                     <button onclick="addTeacherRow()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">+ Tambah Guru</button>
                 </div>
@@ -81,20 +87,20 @@
                     <table class="w-full text-left border-collapse" id="table-teachers">
                         <thead>
                             <tr class="bg-slate-100 text-slate-700 text-xs uppercase tracking-wider">
-                                <th class="p-3 border-b">Kode</th>
+                                <th class="p-3 border-b w-20">Kode</th>
                                 <th class="p-3 border-b">Nama Guru & Gelar</th>
-                                <th class="p-3 border-b">Mapel Diampu (Pisahkan koma)</th>
-                                <th class="p-3 border-b text-center">Status Panitia?</th>
-                                <th class="p-3 border-b text-center">Aksi</th>
+                                <th class="p-3 border-b">Mapel Diampu</th>
+                                <th class="p-3 border-b text-center">Panitia Inti?</th>
+                                <th class="p-3 border-b text-center w-20">Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="teacher-tbody" class="text-sm">
-                            <!-- Data dikosongkan/bersih di awal -->
+                            <!-- Data dirender dinamis -->
                         </tbody>
                     </table>
                 </div>
-                <div class="mt-4 flex justify-end">
-                    <button onclick="saveTeacherData()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition">Simpan Data Guru</button>
+                <div class="mt-4 flex justify-end gap-3">
+                    <button onclick="saveTeacherData()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition">Simpan Perubahan Data</button>
                 </div>
             </div>
         </section>
@@ -102,47 +108,55 @@
         <!-- TAB 3: RUANG & HARI UJIAN -->
         <section id="tab-rooms" class="hidden space-y-6">
             <div class="bg-white p-6 rounded-xl shadow-xs border border-slate-200">
-                <h2 class="text-lg font-bold text-slate-900 mb-2">Pengaturan Ruang Ujian & Hari Pelaksanaan</h2>
-                <p class="text-xs text-slate-500 mb-4">Atur daftar ruangan serta jadwal harian ujian (termasuk jam khusus seperti MBG, Dhuha, Murojaah, dll).</p>
+                <h2 class="text-lg font-bold text-slate-900 mb-2">Pengaturan Ruang Ujian & Aktivitas Khusus</h2>
+                <p class="text-xs text-slate-500 mb-4">Atur daftar ruangan serta waktu khusus harian (misal: Apel, Murojaah, MBG, Dhuha, dll).</p>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Daftar Ruangan (Pisahkan dengan koma)</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Daftar Ruangan / Kelas (Pisahkan koma)</label>
                         <input type="text" id="input-rooms" value="R1 (Kelas 9A), R2 (Kelas 9B), R3 (Kelas 8A), R4 (Kelas 8B), R5 (Kelas 7A), R6 (Kelas 7B)" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Aktivitas Non-Ujian / Waktu Khusus</label>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Aktivitas Non-Mapel Utama (Waktu Khusus)</label>
                         <input type="text" id="input-special-times" value="Apel Pagi, Dzikir Pagi + Murojaah, MBG, Sholat Dhuha & Istirahat, Sholat Dzuhur & Pulang" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm outline-none">
                     </div>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button onclick="saveRoomsAndActivities()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition">Simpan Ruangan</button>
                 </div>
             </div>
 
             <div class="bg-white p-6 rounded-xl shadow-xs border border-slate-200">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-slate-900">Jadwal Harian & Mata Pelajaran Utama</h3>
+                    <div>
+                        <h3 class="font-bold text-slate-900">Jadwal Harian & Sesi Mata Pelajaran</h3>
+                        <p class="text-xs text-slate-500">Tentukan mata pelajaran yang diujikan per sesi (Jam 1 dan Jam 2) untuk setiap hari.</p>
+                    </div>
                     <button onclick="addScheduleDay()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium">+ Tambah Hari Ujian</button>
                 </div>
                 <div id="schedule-days-container" class="space-y-4">
                     <!-- Dinamis hari ujian -->
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button onclick="saveScheduleDays()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition">Simpan Jadwal Harian</button>
                 </div>
             </div>
         </section>
 
         <!-- TAB 4: GENERATOR & HASIL -->
         <section id="tab-generator" class="hidden space-y-6">
-            <div class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
                 <div>
-                    <h2 class="text-lg font-bold text-slate-900">Proses & Kalkulasi Otomatis</h2>
-                    <p class="text-xs text-slate-500">Sistem akan memetakan pengawas secara adil dan merata, mengecualikan panitia inti, serta mencegah guru mengawas mapel sendiri.</p>
+                    <h2 class="text-lg font-bold text-slate-900">Proses Kalkulasi Matrix Pengawas & Piket</h2>
+                    <p class="text-xs text-slate-500">Sistem memetakan pengawas secara merata (panitia inti dijadwalkan lebih sedikit) dengan format tabel matriks vertikal ruang & horizontal hari.</p>
                 </div>
-                <button onclick="generateMasterSchedule()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium shadow-sm transition">⚡ Generate Jadwal & Pengawas</button>
+                <button onclick="generateMasterSchedule()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium shadow-sm transition">⚡ Generate Jadwal Matriks</button>
             </div>
 
             <div id="output-result-container" class="hidden space-y-8">
-                <!-- Hasil Render Jadwal Pengawas & Siswa -->
-                <div class="bg-white p-8 rounded-xl shadow-xs border border-slate-200 print:shadow-none print:border-none">
-                    <div class="flex justify-end mb-4 print:hidden">
-                        <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium">🖨️ Cetak / Simpan PDF</button>
+                <div class="bg-white p-8 rounded-xl shadow-xs border border-slate-200 print-landscape">
+                    <div class="flex justify-end mb-4 no-print gap-2">
+                        <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium">🖨️ Cetak / Simpan PDF (Landscape)</button>
                     </div>
                     <div id="printable-area" class="space-y-6">
                         <!-- Kop Surat Resmi -->
@@ -156,8 +170,16 @@
                             <p id="print-ta" class="text-sm text-slate-600">TAHUN PELAJARAN 2026/2027</p>
                         </div>
 
-                        <div id="generated-tables-wrapper" class="space-y-8 pt-4">
-                            <!-- Tabel Hasil Generator -->
+                        <!-- Ringkasan Statistik Beban Mengawas -->
+                        <div id="summary-workload-box" class="bg-slate-50 border border-slate-300 p-3 rounded-lg text-xs no-print">
+                            <h4 class="font-bold text-slate-800 mb-1 uppercase tracking-wide">Statistik Beban Mengawas:</h4>
+                            <div id="workload-stats-list" class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                <!-- Statistik dimuat lewat script -->
+                            </div>
+                        </div>
+
+                        <div id="generated-tables-wrapper" class="space-y-8 pt-2">
+                            <!-- Tabel Hasil Generator Bentuk Matriks -->
                         </div>
                     </div>
                 </div>
@@ -166,21 +188,46 @@
 
     </main>
 
-    <!-- Script Logika Aplikasi -->
+    <!-- Script Logika Aplikasi & LocalStorage Persistence -->
     <script>
-        // Data Guru dikosongkan (Clean State)
-        let teachersData = [
-            { code: 1, name: "Nama Guru 1, S.Pd", mapel: "Matematika", isCommittee: false },
-            { code: 2, name: "Nama Guru 2, S.Pd", mapel: "Bahasa Indonesia", isCommittee: false },
-            { code: 3, name: "Nama Guru 3, M.Pd", mapel: "IPA", isCommittee: false },
-            { code: 4, name: "Nama Guru 4, S.Pd", mapel: "IPS", isCommittee: false },
-            { code: 5, name: "Nama Guru 5, S.Pd", mapel: "Bahasa Inggris", isCommittee: true } // Panitia Inti
+        let defaultTeachers = [
+            { code: 1, name: "Ahmad Fauzi, S.Pd", mapel: "Matematika", isCommittee: false },
+            { code: 2, name: "Siti Aminah, M.Pd", mapel: "Bahasa Indonesia", isCommittee: false },
+            { code: 3, name: "Budi Santoso, S.Pd", mapel: "IPA", isCommittee: false },
+            { code: 4, name: "Dewi Lestari, S.Pd", mapel: "IPS", isCommittee: false },
+            { code: 5, name: "Eko Prasetyo, S.Kom", mapel: "Bahasa Inggris", isCommittee: false },
+            { code: 6, name: "Dr. H. M. Ridwan", mapel: "Pendidikan Agama", isCommittee: true }, // Panitia Inti
+            { code: 7, name: "Rina Wati, S.Pd", mapel: "PPKN", isCommittee: true } // Panitia Inti
         ];
 
-        let scheduleDays = [
-            { day: "Senin, Tanggal Bulan Tahun", mapel: "MATEMATIKA" },
-            { day: "Selasa, Tanggal Bulan Tahun", mapel: "ILMU PENGETAHUAN ALAM (IPA)" }
+        let defaultScheduleDays = [
+            { day: "Senin, 30 November 2026", session1: "MATEMATIKA", session2: "AQIDAH AKHLAQ" },
+            { day: "Selasa, 1 Desember 2026", session1: "IPA", session2: "KEMUHAMMADIYAHAN" },
+            { day: "Rabu, 2 Desember 2026", session1: "BAHASA INDONESIA", session2: "PJOK" }
         ];
+
+        let teachersData = JSON.parse(localStorage.getItem('app_teachers')) || defaultTeachers;
+        let scheduleDays = JSON.parse(localStorage.getItem('app_schedule')) || defaultScheduleDays;
+        let appSettings = JSON.parse(localStorage.getItem('app_settings')) || {
+            instansi: "SMP/MTs [NAMA INSTANSI]",
+            alamat: "Jalan [Nama Jalan] No. X, Kota/Kabupaten",
+            jenisUjian: "SUMATIF AKHIR SEMESTER (SAS) GANJIL",
+            ta: "2026/2027",
+            rooms: "R1 (Kelas 9A), R2 (Kelas 9B), R3 (Kelas 8A), R4 (Kelas 8B), R5 (Kelas 7A), R6 (Kelas 7B)",
+            specialTimes: "Apel Pagi, Dzikir Pagi + Murojaah, MBG, Sholat Dhuha & Istirahat, Sholat Dzuhur & Pulang"
+        };
+
+        // Load settings ke form setup
+        document.getElementById('input-instansi').value = appSettings.instansi;
+        document.getElementById('input-alamat').value = appSettings.alamat;
+        document.getElementById('input-jenis-ujian').value = appSettings.jenisUjian;
+        document.getElementById('input-ta').value = appSettings.ta;
+        document.getElementById('input-rooms').value = appSettings.rooms;
+        document.getElementById('input-special-times').value = appSettings.specialTimes;
+
+        document.getElementById('app-instansi-name').innerText = appSettings.instansi;
+        document.getElementById('app-instansi-address').innerText = appSettings.alamat;
+        document.getElementById('app-exam-badge').innerText = appSettings.jenisUjian;
 
         function switchTab(tabId) {
             ['tab-setup', 'tab-teachers', 'tab-rooms', 'tab-generator'].forEach(id => {
@@ -221,9 +268,10 @@
         function removeTeacher(index) {
             teachersData.splice(index, 1);
             renderTeacherTable();
+            saveTeacherData(false);
         }
 
-        function saveTeacherData() {
+        function saveTeacherData(showAlert = true) {
             const codes = document.querySelectorAll('.t-code');
             const names = document.querySelectorAll('.t-name');
             const mapels = document.querySelectorAll('.t-mapel');
@@ -238,7 +286,8 @@
                     isCommittee: comms[i].checked
                 });
             }
-            alert('Data guru berhasil disimpan!');
+            localStorage.setItem('app_teachers', JSON.stringify(teachersData));
+            if(showAlert) alert('Data guru & status panitia berhasil disimpan secara permanen di browser!');
         }
 
         function renderScheduleDaysUI() {
@@ -251,9 +300,13 @@
                             <label class="block text-xs font-semibold text-slate-500 mb-1">Hari & Tanggal</label>
                             <input type="text" value="${s.day}" class="w-full border rounded p-2 text-sm s-day" data-index="${idx}">
                         </div>
-                        <div class="w-full md:w-1/2">
-                            <label class="block text-xs font-semibold text-slate-500 mb-1">Mata Pelajaran Utama Diujiankan</label>
-                            <input type="text" value="${s.mapel}" class="w-full border rounded p-2 text-sm s-mapel" data-index="${idx}">
+                        <div class="w-full md:w-1/3">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Mapel Sesi 1 (Jam Pertama)</label>
+                            <input type="text" value="${s.session1}" class="w-full border rounded p-2 text-sm s-ses1" data-index="${idx}">
+                        </div>
+                        <div class="w-full md:w-1/3">
+                            <label class="block text-xs font-semibold text-slate-500 mb-1">Mapel Sesi 2 (Jam Kedua / Opsional)</label>
+                            <input type="text" value="${s.session2 || ''}" class="w-full border rounded p-2 text-sm s-ses2" data-index="${idx}">
                         </div>
                         <div class="w-full md:w-auto flex items-end">
                             <button onclick="removeScheduleDay(${idx})" class="bg-red-100 text-red-600 px-3 py-2 rounded text-xs font-bold hover:bg-red-200">Hapus</button>
@@ -264,91 +317,178 @@
         }
 
         function addScheduleDay() {
-            scheduleDays.push({ day: "Hari Baru, Tanggal", mapel: "MATA PELAJARAN" });
+            scheduleDays.push({ day: "Hari Baru, Tanggal", session1: "MATA PELAJARAN 1", session2: "MATA PELAJARAN 2" });
             renderScheduleDaysUI();
         }
 
         function removeScheduleDay(idx) {
             scheduleDays.splice(idx, 1);
             renderScheduleDaysUI();
+            saveScheduleDays(false);
+        }
+
+        function saveScheduleDays(showAlert = true) {
+            const days = document.querySelectorAll('.s-day');
+            const ses1 = document.querySelectorAll('.s-ses1');
+            const ses2 = document.querySelectorAll('.s-ses2');
+
+            scheduleDays = [];
+            for(let i=0; i<days.length; i++) {
+                scheduleDays.push({
+                    day: days[i].value,
+                    session1: ses1[i].value,
+                    session2: ses2[i].value
+                });
+            }
+            localStorage.setItem('app_schedule', JSON.stringify(scheduleDays));
+            if(showAlert) alert('Jadwal harian ujian berhasil disimpan!');
+        }
+
+        function saveRoomsAndActivities() {
+            appSettings.rooms = document.getElementById('input-rooms').value;
+            appSettings.specialTimes = document.getElementById('input-special-times').value;
+            localStorage.setItem('app_settings', JSON.stringify(appSettings));
+            alert('Pengaturan ruangan berhasil disimpan!');
         }
 
         function saveGeneralSettings() {
-            document.getElementById('app-instansi-name').innerText = document.getElementById('input-instansi').value;
-            document.getElementById('app-instansi-address').innerText = document.getElementById('input-alamat').value;
-            document.getElementById('app-exam-badge').innerText = document.getElementById('input-jenis-ujian').value;
-            alert('Pengaturan umum disimpan!');
+            appSettings.instansi = document.getElementById('input-instansi').value;
+            appSettings.alamat = document.getElementById('input-alamat').value;
+            appSettings.jenisUjian = document.getElementById('input-jenis-ujian').value;
+            appSettings.ta = document.getElementById('input-ta').value;
+            
+            localStorage.setItem('app_settings', JSON.stringify(appSettings));
+
+            document.getElementById('app-instansi-name').innerText = appSettings.instansi;
+            document.getElementById('app-instansi-address').innerText = appSettings.alamat;
+            document.getElementById('app-exam-badge').innerText = appSettings.jenisUjian;
+            alert('Pengaturan instansi berhasil disimpan!');
         }
 
         function generateMasterSchedule() {
+            saveTeacherData(false);
+            saveScheduleDays(false);
+
             const roomsStr = document.getElementById('input-rooms').value;
             const rooms = roomsStr.split(',').map(r => r.trim()).filter(r => r.length > 0);
             
-            const dayInputs = document.querySelectorAll('.s-day');
-            const mapelInputs = document.querySelectorAll('.s-mapel');
-            let currentSchedule = [];
-            for(let i=0; i<dayInputs.length; i++) {
-                currentSchedule.push({
-                    day: dayInputs[i].value,
-                    mapel: mapelInputs[i].value
-                });
-            }
+            let regularPool = teachersData.filter(t => !t.isCommittee);
+            let committeePool = teachersData.filter(t => t.isCommittee);
+            if(regularPool.length === 0) regularPool = teachersData;
 
-            let availableProctors = teachersData.filter(t => !t.isCommittee);
-            if(availableProctors.length === 0) availableProctors = teachersData;
+            let workloadStats = {};
+            teachersData.forEach(t => {
+                workloadStats[t.name] = { pengawas: 0, isCommittee: t.isCommittee };
+            });
 
-            let proctorIndexPointer = 0;
+            // Pembobotan: Panitia inti dimasukkan pool dengan frekuensi lebih sedikit agar jarang terpilih
+            let weightedPool = [...regularPool];
+            committeePool.forEach(c => {
+                weightedPool.push(c); // Hanya dimasukkan sekali agar peluang terpilih jauh lebih kecil
+            });
+
+            let pIndex = 0;
+            let cIndex = 0;
             let htmlOutput = '';
 
-            currentSchedule.forEach((sch, dayIdx) => {
-                htmlOutput += `
-                    <div class="mb-6">
-                        <h4 class="font-bold text-slate-800 text-md bg-slate-100 p-2 border-l-4 border-blue-600 mb-2">${sch.day} — Mapel: <span class="text-blue-700">${sch.mapel}</span></h4>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border border-slate-300 text-xs">
-                                <thead>
-                                    <tr class="bg-slate-200 text-slate-800">
-                                        <th class="p-2 border border-slate-300">No Ruang / Kelas</th>
-                                        <th class="p-2 border border-slate-300">Waktu Utama (07.30 - 09.00)</th>
-                                        <th class="p-2 border border-slate-300">Guru Pengawas (Anti-Bentrok)</th>
-                                        <th class="p-2 border border-slate-300">Waktu Sesi 2 (10.00 - 11.30)</th>
-                                        <th class="p-2 border border-slate-300">Guru Pengawas Sesi 2</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                `;
+            // Render dalam format Matriks Persis Dokumen Pertama (Kolom: Hari, Baris: Ruang)
+            htmlOutput += `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-center border border-slate-400 text-[10px]">
+                        <thead>
+                            <tr class="bg-slate-200 text-slate-900 font-bold">
+                                <th class="p-2 border border-slate-400 w-16" rowspan="2">Ruang / Kelas</th>
+            `;
 
-                rooms.forEach((room, rIdx) => {
-                    let proctor1 = getValidProctor(sch.mapel, availableProctors, proctorIndexPointer);
-                    proctorIndexPointer = (proctorIndexPointer + 1) % availableProctors.length;
+            scheduleDays.forEach(sch => {
+                let colspan = sch.session2 ? 2 : 1;
+                htmlOutput += `<th class="p-2 border border-slate-400" colspan="${colspan}">${sch.day}</th>`;
+            });
 
-                    let proctor2 = getValidProctor(sch.mapel, availableProctors, proctorIndexPointer);
-                    proctorIndexPointer = (proctorIndexPointer + 1) % availableProctors.length;
+            htmlOutput += `
+                            </tr>
+                            <tr class="bg-slate-100 text-slate-800">
+            `;
 
-                    htmlOutput += `
-                        <tr>
-                            <td class="p-2 border border-slate-300 font-semibold">${room}</td>
-                            <td class="p-2 border border-slate-300">${sch.mapel}</td>
-                            <td class="p-2 border border-slate-300 text-blue-900 font-medium">${proctor1.name} <span class="text-[10px] text-slate-500">(Kode: ${proctor1.code})</span></td>
-                            <td class="p-2 border border-slate-300">Mapel Sesi 2 / Pendukung</td>
-                            <td class="p-2 border border-slate-300 text-blue-900 font-medium">${proctor2.name} <span class="text-[10px] text-slate-500">(Kode: ${proctor2.code})</span></td>
-                        </tr>
-                    `;
+            scheduleDays.forEach(sch => {
+                htmlOutput += `<th class="p-1.5 border border-slate-400">Jam 1 (${sch.session1})</th>`;
+                if(sch.session2) {
+                    htmlOutput += `<th class="p-1.5 border border-slate-400">Jam 2 (${sch.session2})</th>`;
+                }
+            });
+
+            htmlOutput += `
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            rooms.forEach((room, rIdx) => {
+                htmlOutput += `<tr><td class="p-2 border border-slate-400 font-bold bg-slate-50">${room}</td>`;
+
+                scheduleDays.forEach(sch => {
+                    // Jam 1
+                    let proctor1 = getValidProctor(sch.session1, weightedPool, pIndex);
+                    pIndex = (pIndex + 1) % weightedPool.length;
+                    workloadStats[proctor1.name].pengawas++;
+
+                    htmlOutput += `<td class="p-2 border border-slate-400">${proctor1.name} <br/><span class="text-[9px] text-slate-500">(K:${proctor1.code})</span></td>`;
+
+                    // Jam 2 (jika ada)
+                    if(sch.session2) {
+                        let proctor2 = getValidProctor(sch.session2, weightedPool, pIndex);
+                        pIndex = (pIndex + 1) % weightedPool.length;
+                        workloadStats[proctor2.name].pengawas++;
+                        htmlOutput += `<td class="p-2 border border-slate-400">${proctor2.name} <br/><span class="text-[9px] text-slate-500">(K:${proctor2.code})</span></td>`;
+                    }
                 });
 
-                htmlOutput += `
-                                </tbody>
-                            </table>
+                htmlOutput += `</tr>`;
+            });
+
+            htmlOutput += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            // Render Tabel Kode Guru di Bawahnya (Persis Format Dokumen 1)
+            htmlOutput += `
+                <div class="mt-8 pt-4 border-t border-slate-300">
+                    <h4 class="font-bold text-slate-800 text-xs mb-2 uppercase tracking-wide">KODE PENGAWAS / GURU:</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+            `;
+
+            teachersData.forEach(t => {
+                let tag = t.isCommittee ? ' <span class="text-[9px] bg-amber-100 text-amber-800 px-1 rounded">Panitia</span>' : '';
+                htmlOutput += `<div class="border border-slate-200 p-1.5 rounded bg-slate-50"><b>${t.code}.</b> ${t.name}${tag}</div>`;
+            });
+
+            htmlOutput += `
+                    </div>
+                </div>
+            `;
+
+            // Statistik Ringkasan Beban
+            let statsHtml = '';
+            for(let [name, data] of Object.entries(workloadStats)) {
+                let badge = data.isCommittee ? '<span class="bg-amber-100 text-amber-800 px-1 rounded text-[9px]">Panitia</span>' : '<span class="bg-blue-100 text-blue-800 px-1 rounded text-[9px]">Guru</span>';
+                statsHtml += `
+                    <div class="bg-white p-2 border border-slate-200 rounded flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold text-slate-900">${name} ${badge}</p>
+                            <p class="text-[10px] text-slate-500">Total Mengawas: <b>${data.pengawas} sesi</b></p>
                         </div>
                     </div>
                 `;
-            });
+            }
+            document.getElementById('workload-stats-list').innerHTML = statsHtml;
 
-            document.getElementById('print-instansi').innerText = document.getElementById('input-instansi').value;
-            document.getElementById('print-school').innerText = document.getElementById('input-instansi').value;
-            document.getElementById('print-address').innerText = document.getElementById('input-alamat').value;
-            document.getElementById('print-exam-title').innerText = "JADWAL PENGAWAS " + document.getElementById('input-jenis-ujian').value;
-            document.getElementById('print-ta').innerText = "TAHUN PELAJARAN " + document.getElementById('input-ta').value;
+            document.getElementById('print-instansi').innerText = appSettings.instansi;
+            document.getElementById('print-school').innerText = appSettings.instansi;
+            document.getElementById('print-address').innerText = "Alamat: " + appSettings.alamat;
+            document.getElementById('print-exam-title').innerText = "JADWAL PENGAWAS " + appSettings.jenisUjian;
+            document.getElementById('print-ta').innerText = "TAHUN PELAJARAN " + appSettings.ta;
 
             document.getElementById('generated-tables-wrapper').innerHTML = htmlOutput;
             document.getElementById('output-result-container').classList.remove('hidden');
