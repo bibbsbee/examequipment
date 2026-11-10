@@ -74,18 +74,26 @@
                 </div>
             </div>
 
-            <!-- Jam Kegiatan Non-Ujian / Waktu Khusus -->
+            <!-- Jam Kegiatan & Waktu Khusus Ujian -->
             <div class="bg-white p-6 rounded-xl shadow-xs border border-slate-200">
-                <h2 class="text-lg font-bold text-slate-900 mb-2">Pengaturan Waktu Kegiatan Non-Ujian (Harian)</h2>
-                <p class="text-xs text-slate-500 mb-4">Tentukan jam kegiatan harian yang akan dicetak di matriks pengawas.</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <h2 class="text-lg font-bold text-slate-900 mb-2">Pengaturan Waktu Kegiatan & Jam Mapel</h2>
+                <p class="text-xs text-slate-500 mb-4">Tentukan jam kegiatan harian serta jam pelaksanaan Sesi 1 & Sesi 2.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Jam Apel Pagi / Dzikir</label>
                         <input type="text" id="time-apel" value="06.50 - 07.30 WIB" placeholder="Contoh: 06.50-07.30" onfocus="clearPlaceholder(this)" class="w-full border rounded p-2 text-sm">
                     </div>
                     <div>
+                        <label class="block text-xs font-semibold text-blue-700 mb-1">Jam Mapel Sesi 1 (Jam 1)</label>
+                        <input type="text" id="time-sesi1" value="07.30 - 09.30 WIB" placeholder="Contoh: 07.30-09.30" onfocus="clearPlaceholder(this)" class="w-full border rounded p-2 text-sm bg-blue-50/50">
+                    </div>
+                    <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Jam Sholat Dhuha & Istirahat</label>
                         <input type="text" id="time-dhuha" value="09.30 - 10.00 WIB" placeholder="Contoh: 09.30-10.00" onfocus="clearPlaceholder(this)" class="w-full border rounded p-2 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-blue-700 mb-1">Jam Mapel Sesi 2 (Jam 2)</label>
+                        <input type="text" id="time-sesi2" value="10.00 - 11.30 WIB" placeholder="Contoh: 10.00-11.30" onfocus="clearPlaceholder(this)" class="w-full border rounded p-2 text-sm bg-blue-50/50">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 mb-1">Jam Sholat Dzuhur & Pulang</label>
@@ -98,7 +106,7 @@
             </div>
         </section>
 
-        <!-- TAB 2: MASTER MAPEL & GURU (MULTI-SELECT) -->
+        <!-- TAB 2: MASTER MAPEL & GURU -->
         <section id="tab-teachers" class="hidden space-y-6">
             <div class="bg-white p-6 rounded-xl shadow-xs border border-slate-200">
                 <div class="flex justify-between items-center mb-4">
@@ -173,7 +181,7 @@
             <div class="bg-white p-6 rounded-xl shadow-xs border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 no-print">
                 <div>
                     <h2 class="text-lg font-bold text-slate-900">Generator Matriks Pengawas Presisi</h2>
-                    <p class="text-xs text-slate-500">Membentuk tabel sesuai format dokumen referensi (Ruang Vertikal, Hari & Sesi Horizontal) dengan kuota panitia lebih sedikit.</p>
+                    <p class="text-xs text-slate-500">Membentuk tabel matriks dengan kode guru, sebaran adil per ruang, kalkulasi beban, dan ekspor Excel rapi.</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="generateMasterSchedule()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-medium shadow-sm transition">⚡ Generate Matriks</button>
@@ -215,11 +223,18 @@
         ];
 
         let defaultTeachers = [
+            { code: 1, name: "Dr. H. Ahmad Fauzi, M.Pd.I", mapel: ["Aqidah Akhlak", "Fiqih"], isCommittee: true },
             { code: 2, name: "Abdul Wahid, M.Pd", mapel: ["Bahasa Inggris"], isCommittee: false },
             { code: 3, name: "Ami Wibisono, M.Pd", mapel: ["Bahasa Arab"], isCommittee: false },
             { code: 4, name: "Uswaton Khasanah, M.Pd", mapel: ["Bahasa Indonesia"], isCommittee: false },
+            { code: 5, name: "Dra. Hj. Siti Aminah", mapel: ["Matematika", "IPA"], isCommittee: false },
+            { code: 6, name: "Eko Prasetyo, S.Kom", mapel: ["TIK"], isCommittee: false },
+            { code: 7, name: "Rina Kusuma Dewi, S.Pd", mapel: ["Seni Rupa", "PJOK"], isCommittee: false },
             { code: 8, name: "M. Ali Burhan, M.Pd", mapel: ["PPKN"], isCommittee: true },
             { code: 9, name: "Hafsah Wahyu N. A, S.Pd", mapel: ["IPS"], isCommittee: true },
+            { code: 10, name: "Ahmad Zaini, S.Pd.I", mapel: ["Qur'an Hadits", "SKI"], isCommittee: false },
+            { code: 11, name: "Nur Laili, M.Pd", mapel: ["Bahasa Indonesia", "Kemuhammadiyahan"], isCommittee: false },
+            { code: 12, name: "Budi Santoso, S.Pd", mapel: ["Matematika", "PJOK"], isCommittee: false },
             { code: 13, name: "Melati Nadhilah Putri, S.Pd", mapel: ["IPA"], isCommittee: false }
         ];
 
@@ -238,18 +253,22 @@
             ta: "2026/2027",
             rooms: "R1 (KLS 9B), R2 (KLS 9A), R3 (KLS 9C), R4 (KLS 7A), R5 (KLS 8C), R6 (KLS 7B), R7 (KLS 8A), R8 (KLS 7D), R9 (KLS 7C), R10 (KLS 9D), R11 (KLS 8B)",
             timeApel: "06.50 - 07.30 WIB",
+            timeSesi1: "07.30 - 09.30 WIB",
             timeDhuha: "09.30 - 10.00 WIB",
+            timeSesi2: "10.00 - 11.30 WIB",
             timeDzuhur: "11.30 - 12.00 WIB"
         };
 
-        // Load settings
+        // Load settings to form
         document.getElementById('input-instansi').value = appSettings.instansi;
         document.getElementById('input-alamat').value = appSettings.alamat;
         document.getElementById('input-jenis-ujian').value = appSettings.jenisUjian;
         document.getElementById('input-ta').value = appSettings.ta;
         document.getElementById('input-rooms').value = appSettings.rooms;
         document.getElementById('time-apel').value = appSettings.timeApel;
+        document.getElementById('time-sesi1').value = appSettings.timeSesi1;
         document.getElementById('time-dhuha').value = appSettings.timeDhuha;
+        document.getElementById('time-sesi2').value = appSettings.timeSesi2;
         document.getElementById('time-dzuhur').value = appSettings.timeDzuhur;
 
         function clearPlaceholder(el) {
@@ -375,11 +394,11 @@
                                 <input type="text" value="${s.day}" class="w-full border rounded p-2 text-sm s-day" data-index="${idx}" onfocus="clearPlaceholder(this)">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">Mapel Sesi 1 (Jam Pertama)</label>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">Mapel Sesi 1 (Jam 1)</label>
                                 <select class="w-full border rounded p-2 text-sm s-ses1 bg-white" data-index="${idx}">${opt1}</select>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-500 mb-1">Mapel Sesi 2 (Jam Kedua)</label>
+                                <label class="block text-xs font-semibold text-slate-500 mb-1">Mapel Sesi 2 (Jam 2)</label>
                                 <select class="w-full border rounded p-2 text-sm s-ses2 bg-white" data-index="${idx}">${opt2}</select>
                             </div>
                         </div>
@@ -431,7 +450,9 @@
             appSettings.jenisUjian = document.getElementById('input-jenis-ujian').value;
             appSettings.ta = document.getElementById('input-ta').value;
             appSettings.timeApel = document.getElementById('time-apel').value;
+            appSettings.timeSesi1 = document.getElementById('time-sesi1').value;
             appSettings.timeDhuha = document.getElementById('time-dhuha').value;
+            appSettings.timeSesi2 = document.getElementById('time-sesi2').value;
             appSettings.timeDzuhur = document.getElementById('time-dzuhur').value;
             
             localStorage.setItem('app_settings', JSON.stringify(appSettings));
@@ -443,7 +464,6 @@
             saveScheduleDays(false);
 
             const roomsStr = document.getElementById('input-rooms').value;
-            // Format: R1 (KLS 9B) -> parsing kode dan kelas
             let roomList = [];
             roomsStr.split(',').forEach(r => {
                 let parts = r.trim().match(/(.*?)\s*\((.*?)\)/);
@@ -454,22 +474,42 @@
                 }
             });
 
+            // Tracking frekuensi mengawas tiap guru (untuk kalkulasi sama rata)
+            let dutyCount = {};
+            teachersData.forEach(t => { dutyCount[t.code] = 0; });
+
             let regularPool = teachersData.filter(t => !t.isCommittee);
             let committeePool = teachersData.filter(t => t.isCommittee);
             if(regularPool.length === 0) regularPool = teachersData;
 
-            let weightedPool = [...regularPool];
-            committeePool.forEach(c => weightedPool.push(c)); // Panitia lebih sedikit frekuensinya
+            // Generator matriks dengan algoritma pengacakan ketat per slot/ruang (tidak boleh mapel sendiri & diacak merata)
+            let scheduleMatrix = []; // Simpan data untuk render & export excel
 
-            let pIndex = 0;
+            scheduleDays.forEach(sch => {
+                // Sesi 1
+                let proctorsSes1 = assignProctorsForSlot(sch.session1, roomList, regularPool, committeePool, dutyCount);
+                // Sesi 2
+                let proctorsSes2 = assignProctorsForSlot(sch.session2, roomList, regularPool, committeePool, dutyCount);
+
+                scheduleMatrix.push({
+                    day: sch.day,
+                    piket: sch.piket,
+                    session1Name: sch.session1,
+                    session2Name: sch.session2,
+                    proctorsSes1: proctorsSes1,
+                    proctorsSes2: proctorsSes2
+                });
+            });
+
+            // Render HTML Tabel Utama
             let htmlOutput = `
                 <div class="overflow-x-auto">
-                    <table class="w-full text-center border border-slate-900 text-[10px]">
+                    <table class="w-full text-center border border-slate-900 text-[10px]" id="matrix-table">
                         <thead>
                             <tr class="bg-slate-200 text-slate-900 font-bold">
-                                <th class="p-2 border border-slate-900 w-16" rowspan="3">Hari / Tanggal</th>
-                                <th class="p-2 border border-slate-900 w-24" rowspan="3">Panitia Piket</th>
-                                <th class="p-2 border border-slate-900 w-20" rowspan="3">Waktu Kegiatan</th>
+                                <th class="p-2 border border-slate-900 w-28" rowspan="3">Hari / Tanggal</th>
+                                <th class="p-2 border border-slate-900 w-32" rowspan="3">Panitia Piket</th>
+                                <th class="p-2 border border-slate-900 w-24" rowspan="3">Waktu Kegiatan</th>
             `;
 
             roomList.forEach(room => {
@@ -491,8 +531,8 @@
                         <tbody>
             `;
 
-            scheduleDays.forEach(sch => {
-                // Baris Jam Apel / Dzikir Pagi
+            scheduleMatrix.forEach(sch => {
+                // Baris Apel Pagi
                 htmlOutput += `
                     <tr>
                         <td class="p-2 border border-slate-900 font-bold bg-slate-50" rowspan="4">${sch.day}</td>
@@ -505,11 +545,10 @@
                 htmlOutput += `</tr>`;
 
                 // Baris Sesi 1
-                htmlOutput += `<tr><td class="p-1.5 border border-slate-900 font-semibold text-blue-900">${sch.session1}</td>`;
-                roomList.forEach(() => {
-                    let proctor = getValidProctor(sch.session1, weightedPool, pIndex);
-                    pIndex = (pIndex + 1) % weightedPool.length;
-                    htmlOutput += `<td class="p-1.5 border border-slate-900 font-medium">${proctor.name} <span class="text-[8px] text-slate-500">(K:${proctor.code})</span></td>`;
+                htmlOutput += `<tr><td class="p-1.5 border border-slate-900 font-semibold text-blue-900">${appSettings.timeSesi1}<br/><span class="text-[9px] text-slate-600">(${sch.session1Name})</span></td>`;
+                roomList.forEach((room, rIdx) => {
+                    let code = sch.proctorsSes1[rIdx];
+                    htmlOutput += `<td class="p-1.5 border border-slate-900 font-bold text-sm text-blue-700 bg-blue-50/30">${code}</td>`;
                 });
                 htmlOutput += `</tr>`;
 
@@ -521,11 +560,10 @@
                 htmlOutput += `</tr>`;
 
                 // Baris Sesi 2
-                htmlOutput += `<tr><td class="p-1.5 border border-slate-900 font-semibold text-blue-900">${sch.session2}</td>`;
-                roomList.forEach(() => {
-                    let proctor = getValidProctor(sch.session2, weightedPool, pIndex);
-                    pIndex = (pIndex + 1) % weightedPool.length;
-                    htmlOutput += `<td class="p-1.5 border border-slate-900 font-medium">${proctor.name} <span class="text-[8px] text-slate-500">(K:${proctor.code})</span></td>`;
+                htmlOutput += `<tr><td class="p-1.5 border border-slate-900 font-semibold text-blue-900">${appSettings.timeSesi2}<br/><span class="text-[9px] text-slate-600">(${sch.session2Name})</span></td>`;
+                roomList.forEach((room, rIdx) => {
+                    let code = sch.proctorsSes2[rIdx];
+                    htmlOutput += `<td class="p-1.5 border border-slate-900 font-bold text-sm text-blue-700 bg-blue-50/30">${code}</td>`;
                 });
                 htmlOutput += `</tr>`;
             });
@@ -536,11 +574,12 @@
                 </div>
             `;
 
-            // Tabel Daftar Kode Guru
+            // Tabel Kalkulasi Beban Mengawas & Keterangan Kode Guru
             htmlOutput += `
-                <div class="mt-6 pt-3 border-t border-slate-300">
-                    <h4 class="font-bold text-slate-800 text-xs mb-2 uppercase tracking-wide">KODE GURU & PENGAWAS:</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 pt-3 border-t border-slate-300">
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-xs mb-2 uppercase tracking-wide">KETERANGAN KODE GURU & PENGAWAS:</h4>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
             `;
 
             teachersData.forEach(t => {
@@ -549,7 +588,40 @@
                 htmlOutput += `<div class="border border-slate-200 p-1.5 rounded bg-slate-50"><b>${t.code}.</b> ${t.name}${tag}<br/><span class="text-[9px] text-slate-500">Mapel: ${mapelsStr}</span></div>`;
             });
 
-            htmlOutput += `</div></div>`;
+            htmlOutput += `
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-xs mb-2 uppercase tracking-wide">KALKULASI FREKUENSI MENGAWAS (SAMA RATA):</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border border-slate-300 text-xs bg-slate-50">
+                               <thead>
+                                   <tr class="bg-slate-200 text-slate-800 font-bold">
+                                       <th class="p-2 border border-slate-300 w-12 text-center">Kode</th>
+                                       <th class="p-2 border border-slate-300">Nama Guru</th>
+                                       <th class="p-2 border border-slate-300 w-28 text-center">Jumlah Masuk (Kali)</th>
+                                   </tr>
+                               </thead>
+                               <tbody>
+            `;
+
+            teachersData.forEach(t => {
+                htmlOutput += `
+                    <tr>
+                        <td class="p-1.5 border border-slate-300 text-center font-bold">${t.code}</td>
+                        <td class="p-1.5 border border-slate-300">${t.name}</td>
+                        <td class="p-1.5 border border-slate-300 text-center font-bold text-blue-600">${dutyCount[t.code] || 0}</td>
+                    </tr>
+                `;
+            });
+
+            htmlOutput += `
+                               </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
 
             document.getElementById('print-instansi').innerText = appSettings.instansi;
             document.getElementById('print-school').innerText = appSettings.instansi;
@@ -563,30 +635,58 @@
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
-        function getValidProctor(currentMapel, pool, startIndex) {
-            let idx = startIndex;
-            let attempts = 0;
-            while(attempts < pool.length) {
-                let candidate = pool[idx];
-                let teachesThisMapel = candidate.mapel && candidate.mapel.some(m => currentMapel.toLowerCase().includes(m.toLowerCase()) || m.toLowerCase().includes(currentMapel.toLowerCase()));
-                
-                if(!teachesThisMapel) {
-                    return candidate;
+        // Fungsi pembantu pengacakan adil per slot ujian (memastikan beda orang per ruang & tidak mengajar mapel tersebut & beban seimbang)
+        function assignProctorsForSlot(currentMapel, roomList, regularPool, committeePool, dutyCount) {
+            let assignedCodes = [];
+            // Gabungkan pool dengan prioritas yang beban mengajarnya paling sedikit (untuk meratakan)
+            let combinedPool = [...regularPool, ...committeePool];
+
+            roomList.forEach(() => {
+                // Urutkan kandidat berdasarkan beban mengawas paling sedikit saat ini, lalu acak sedikit
+                let validCandidates = combinedPool.filter(t => {
+                    let teaches = t.mapel && t.mapel.some(m => currentMapel.toLowerCase().includes(m.toLowerCase()) || m.toLowerCase().includes(currentMapel.toLowerCase()));
+                    let alreadyAssignedInThisSlot = assignedCodes.includes(t.code);
+                    return !teaches && !alreadyAssignedInThisSlot;
+                });
+
+                if(validCandidates.length === 0) {
+                    // Fallback jika semua mengajar mapel ini, ambil yang tidak di slot ini
+                    validCandidates = combinedPool.filter(t => !assignedCodes.includes(t.code));
                 }
-                idx = (idx + 1) % pool.length;
-                attempts++;
-            }
-            return pool[startIndex];
+                if(validCandidates.length === 0) {
+                    validCandidates = combinedPool; // Ultra fallback
+                }
+
+                // Urutkan berdasarkan dutyCount terendah agar adil sama rata
+                validCandidates.sort((a, b) => (dutyCount[a.code] || 0) - (dutyCount[b.code] || 0));
+
+                // Ambil dari kelompok terendah secara acak
+                let minDuty = dutyCount[validCandidates[0].code] || 0;
+                let lowestGroup = validCandidates.filter(t => (dutyCount[t.code] || 0) <= minDuty + 1);
+                let chosen = lowestGroup[Math.floor(Math.random() * lowestGroup.length)];
+
+                assignedCodes.push(chosen.code);
+                dutyCount[chosen.code] = (dutyCount[chosen.code] || 0) + 1;
+            });
+
+            return assignedCodes;
         }
 
         function exportToExcel() {
-            let table = document.querySelector("#generated-tables-wrapper table");
+            // Membuat workbook rapi untuk Excel dari area printable
+            let element = document.getElementById('printable-area');
+            let wb = XLSX.utils.book_new();
+            
+            // Ekspor tabel matriks utama
+            let table = document.querySelector("#matrix-table");
             if(!table) {
                 alert("Silakan generate jadwal terlebih dahulu!");
                 return;
             }
-            let wb = XLSX.utils.table_to_book(table, {sheet: "Jadwal Pengawas"});
-            XLSX.writeFile(wb, "Jadwal_Pengawas_Ujian.xlsx");
+            let ws1 = XLSX.utils.table_to_sheet(table);
+            XLSX.utils.book_append_sheet(wb, ws1, "Jadwal Pengawas");
+
+            XLSX.writeFile(wb, "Jadwal_Pengawas_Ujian_Lengkap.xlsx");
         }
 
         renderMasterMapelUI();
